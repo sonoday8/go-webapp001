@@ -15,15 +15,28 @@ import (
 
 	appMiddleware "github.com/sonoday8/webapp001/app/middleware"
 
+	"github.com/go-playground/validator"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 )
+
+// CustomValidator return valodate
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+// Validate return error
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
 
 func main() {
 	loadEnv()
 	e := echo.New()
 
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
+	e.Validator = &CustomValidator{validator: validator.New()}
+
 	e.GET("/session", func(c echo.Context) error {
 		sess, _ := session.Get("session", c)
 		sess.Options = &sessions.Options{
