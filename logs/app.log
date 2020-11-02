@@ -1,0 +1,9 @@
+{"time":"2020-11-01T21:10:08.314306401+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"15","message":"BB"}
+{"time":"2020-11-01T21:12:18.981606503+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"9","message":"AAAAAAAA"}
+{"time":"2020-11-01T21:12:20.794210337+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"15","message":"BB"}
+{"time":"2020-11-01T21:13:27.055678519+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"9","message":"AAAAAAAA"}
+{"time":"2020-11-01T21:13:28.983665467+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"15","message":"BB"}
+{"time":"2020-11-01T21:13:29.681948729+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"15","message":"BB"}
+{"time":"2020-11-01T21:13:30.170315605+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"15","message":"BB"}
+{"time":"2020-11-01T21:14:27.355264765+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"15","message":"BB"}
+{"time":"2020-11-01T21:14:28.229338293+09:00","level":"DEBUG","prefix":"echo","file":"login.go","line":"15","message":"BB"}
