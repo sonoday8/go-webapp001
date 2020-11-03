@@ -2,13 +2,13 @@ package routes
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/sonoday8/webapp001/app/controller"
+	"github.com/sonoday8/webapp001/app/handler"
 )
 
 // Router return echo.Echo
 func Router(e *echo.Echo) *echo.Echo {
-	e.GET("/login", controller.Index)
-	e.POST("/login", controller.Login)
+	e.GET("/login", handler.LoginIndex)
+	e.POST("/login", handler.LoginExec)
 	e.File("/signup", "public/signup.html")
 
 	root := e.Group("/")
