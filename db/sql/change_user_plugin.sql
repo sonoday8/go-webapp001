@@ -1,0 +1,1 @@
+alter user developer@'%' identified with mysql_native_password by 'secret';

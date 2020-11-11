@@ -1,0 +1,28 @@
+version: '3'
+services:
+  app:
+    build: .
+    tty: true
+    ports: 
+      - "8080:8080"
+    volumes:
+      - .:/go/src/work
+  db:
+    image: mysql
+    container_name: mysql_host
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: main
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: secret
+      TZ: 'Asia/Tokyo'
+    command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db-store:/var/lib/mysql
+      - ./db/mysql_conf/:/etc/mysql/conf.d
+      - ./db/sql:/docker-entrypoint-initdb.d
+      - ./logs:/var/log/mysql
+    ports:
+      - 3306:3306      
+volumes:
+  db-store:
