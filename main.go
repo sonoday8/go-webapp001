@@ -2,7 +2,6 @@ package main
 
 import (
 	stdLog "log"
-	"net/http"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/sonoday8/webapp001/app/env"
 
+	appcontext "github.com/sonoday8/webapp001/app/context"
 	appMiddleware "github.com/sonoday8/webapp001/app/middleware"
 
 	"github.com/gorilla/sessions"
@@ -22,20 +22,6 @@ import (
 func main() {
 	loadEnv()
 	e := echo.New()
-
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
-	e.GET("/session", func(c echo.Context) error {
-		sess, _ := session.Get("session", c)
-		sess.Options = &sessions.Options{
-			Path:     "/",
-			MaxAge:   86400 * 7,
-			HttpOnly: true,
-		}
-		sess.Values["foo"] = "bar"
-		sess.Save(c.Request(), c.Response())
-		return c.NoContent(http.StatusOK)
-	})
-
 	setMiddlewares(e)
 	setDebug(e)
 	router := routes.Router(e)
@@ -48,10 +34,16 @@ func main() {
 func setMiddlewares(e *echo.Echo) {
 	e.Use(middleware.LoggerWithConfig(config.AccessLogConfig))
 	e.Use(middleware.Recover())
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
 	e.Use(appMiddleware.LoggerMiddleware(env.GetStr("APP_LOG", "logs/application.log")))
 	e.Use(appMiddleware.ValidatorMiddleware())
 	e.Use(appMiddleware.TemplateMiddleware("app/views/*/*.html"))
-	// e.Use(appMiddleware.Sessions())
+	// e.Use(appMiddleware.DBConnect())
+	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			return h(&appcontext.DBContext{c})
+		}
+	})
 }
 
 /**

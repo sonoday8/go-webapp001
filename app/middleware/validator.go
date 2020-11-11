@@ -22,9 +22,7 @@ func ValidatorMiddleware() echo.MiddlewareFunc {
 			c.Echo().Validator = &CustomValidator{
 				validator: validator.New(),
 			}
-			err := next(c)
-			// after
-			return err
+			return next(c)
 		}
 	}
 }

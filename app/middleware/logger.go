@@ -14,13 +14,11 @@ func LoggerMiddleware(fileName string) echo.MiddlewareFunc {
 			c.Echo().HidePort = true
 			logFile, logErr := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 			if logErr != nil {
-				panic("log file error")
+				return logErr
 			}
 			c.Echo().Logger.SetOutput(logFile)
 
-			err := next(c)
-			// after
-			return err
+			return next(c)
 		}
 	}
 }

@@ -25,9 +25,8 @@ func TemplateMiddleware(templatePath string) echo.MiddlewareFunc {
 				templates: template.Must(template.ParseGlob(templatePath)),
 			}
 			c.Echo().Renderer = t
-			err := next(c)
 			// after
-			return err
+			return next(c)
 		}
 	}
 }

@@ -47,8 +47,7 @@ func GetStr(name string, def string) string {
  * @param def string デフォルト値
  */
 func getenv(key, def string) string {
-	value := os.Getenv(key)
-	if value != "" {
+	if value := os.Getenv(key); value != "" {
 		return value
 	}
 	return def

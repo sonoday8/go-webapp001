@@ -3,17 +3,18 @@ package routes
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/sonoday8/webapp001/app/handler"
+	appMiddleware "github.com/sonoday8/webapp001/app/middleware"
 )
 
 // Router return echo.Echo
 func Router(e *echo.Echo) *echo.Echo {
 	e.GET("/login", handler.LoginIndex)
 	e.POST("/login", handler.LoginExec)
-	e.File("/signup", "public/signup.html")
+	e.GET("/signup", handler.SignupIndex)
+	e.POST("/signup", handler.SignupExec)
 
 	root := e.Group("/")
-	// root.Use(middleware.KeyAuthWithConfig(config.AuthConfig))
-	// root.Use(middleware.JWTWithConfig(config.AuthConfig))
+	root.Use(appMiddleware.CheckLoginSession())
 	root.File("", "public/index.html")
 
 	// e.POST("/signup", handler.Signup)
