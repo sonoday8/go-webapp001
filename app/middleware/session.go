@@ -8,6 +8,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var SessionKey = "session"
+
+func SessionMiddleware() echo.MiddlewareFunc {
+	return session.Middleware(sessions.NewCookieStore([]byte("secret")))
+}
+
 // CheckLoginSession retrun echo.MiddlewareFunc
 func CheckLoginSession() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -18,6 +24,7 @@ func CheckLoginSession() echo.MiddlewareFunc {
 			}
 
 			if isLogin, _ := sess.Values["auth"]; isLogin != true {
+				DeleteLoginSession(c)
 				return c.Redirect(http.StatusFound, "/login")
 			}
 			return next(c)
@@ -26,13 +33,22 @@ func CheckLoginSession() echo.MiddlewareFunc {
 }
 
 // StoreLoginSession return void
-func StoreLoginSession(c echo.Context) {
-	sess, _ := session.Get("session", c)
+func StoreLoginSession(c echo.Context) error {
+	sess, _ := session.Get(SessionKey, c)
 	sess.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   86400 * 7,
+		Path:   "/",
+		MaxAge: 0,
+		//MaxAge:   86400 * 7,
 		HttpOnly: true,
 	}
 	sess.Values["auth"] = true
-	sess.Save(c.Request(), c.Response())
+	return sess.Save(c.Request(), c.Response())
 }
+
+func DeleteLoginSession(c echo.Context) error {
+	sess, _ := session.Get(SessionKey, c)
+	sess.Options.MaxAge = -1
+	return sess.Save(c.Request(), c.Response())
+}
+
+//		delete(s.Values, key)

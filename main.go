@@ -12,11 +12,9 @@ import (
 
 	"github.com/sonoday8/webapp001/app/env"
 
-	appcontext "github.com/sonoday8/webapp001/app/context"
+	appContext "github.com/sonoday8/webapp001/app/context"
+	appHandler "github.com/sonoday8/webapp001/app/handler"
 	appMiddleware "github.com/sonoday8/webapp001/app/middleware"
-
-	"github.com/gorilla/sessions"
-	"github.com/labstack/echo-contrib/session"
 )
 
 func main() {
@@ -24,6 +22,7 @@ func main() {
 	e := echo.New()
 	setMiddlewares(e)
 	setDebug(e)
+	e.HTTPErrorHandler = appHandler.CustomHTTPErrorHandler
 	router := routes.Router(e)
 	router.Logger.Fatal(router.Start(":" + env.GetStr("SERVER_PORT", "8080")))
 }
@@ -34,16 +33,18 @@ func main() {
 func setMiddlewares(e *echo.Echo) {
 	e.Use(middleware.LoggerWithConfig(config.AccessLogConfig))
 	e.Use(middleware.Recover())
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
+	e.Use(appMiddleware.SessionMiddleware())
 	e.Use(appMiddleware.LoggerMiddleware(env.GetStr("APP_LOG", "logs/application.log")))
 	e.Use(appMiddleware.ValidatorMiddleware())
-	e.Use(appMiddleware.TemplateMiddleware("app/views/*/*.html"))
-	// e.Use(appMiddleware.DBConnect())
+	e.Use(appMiddleware.TemplateMiddleware("app/views/*.html", "app/views/*/*.html"))
 	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			return h(&appcontext.DBContext{c})
+			return h(&appContext.DBContext{c})
 		}
 	})
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		TokenLookup: "form:token",
+	}))
 }
 
 /**

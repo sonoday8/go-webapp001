@@ -19,13 +19,11 @@ func (c *DBContext) DBConn(fn func(*gorm.DB) error) error {
 	if err != nil {
 		return err
 	}
-	if err = fn(db); err != nil {
-		return err
-	}
-	if err = db.Close(); err != nil {
-		return err
-	}
-	return nil
+	err = fn(db)
+	defer func() {
+		err = db.Close()
+	}()
+	return err
 }
 
 func (c *DBContext) DBTran(fn func(*gorm.DB) error) error {

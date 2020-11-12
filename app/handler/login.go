@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/labstack/echo/v4/middleware"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -15,23 +16,23 @@ import (
 // Login Page params
 type viewParams struct {
 	LoginForm *LoginForm
-	Name      string
-	Users     []appModels.User
+	Token     string
+	Title     string
 }
 
 // LoginIndex return echo.HandlerFunc
 func LoginIndex(c echo.Context) error {
 	loginForm := new(LoginForm)
-	var users []appModels.User
-	users, err := appModels.GetAllUsers(c)
+	k, err := c.Cookie(middleware.DefaultCSRFConfig.CookieName)
 	if err != nil {
 		return err
 	}
 	data := viewParams{
 		LoginForm: loginForm,
-		Name:      "ソノデン",
-		Users:     users,
+		Token:     k.Value,
+		Title:     "ログイン",
 	}
+
 	return c.Render(http.StatusOK, "login_index.html", data)
 }
 
@@ -52,18 +53,11 @@ func LoginExec(c echo.Context) error {
 		loginForm.Password = "" //Password clear
 		data := viewParams{
 			LoginForm: loginForm,
-			Name:      "Sonoda",
 		}
 		return c.Render(http.StatusUnprocessableEntity, "login_index.html", data)
 	}
 
 	password := []byte(loginForm.Password)
-	// hash, err := bcrypt.GenerateFromPassword(password, 8)
-	// if err != nil {
-	// 	c.Logger().Error(err)
-	// 	return err
-	// }
-
 	user := new(appModels.User)
 	user.LoginID = loginForm.LoginID
 	dbc := c.(*appContext.DBContext)
@@ -83,6 +77,8 @@ func LoginExec(c echo.Context) error {
 		c.Logger().Error(err)
 		return err
 	}
-	appMiddleware.StoreLoginSession(c)
+	if err := appMiddleware.StoreLoginSession(c); err != nil {
+		return err
+	}
 	return c.Redirect(http.StatusFound, "/")
 }
